@@ -2,13 +2,11 @@ const express = require("express");
 const router = express.Router();
 const db = require("../../data.js");
 
-// Função para tratar erros
 const handleDatabaseError = (res, err) => {
   console.error(err.message);
   res.status(500).send("Erro ao acessar o banco de dados");
 };
 
-// Handler para buscar todos os clientes
 router.get("/", (req, res) => {
   db.all("SELECT * FROM Clientes", (err, rows) => {
     if (err) {
