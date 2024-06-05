@@ -38,17 +38,54 @@ router.get("/:parametro", (req, res) => {
   );
 });
 
-router.post("/", (req, res) => {
-  const { modelo, marca, ano, placa, disponibilidade } = req.body;
+router.put("/:id", (req, res) => {
+  const id = req.params.id;
+  const { Modelo, Marca, Ano, Placa, Disponibilidade } = req.body;
+
   db.run(
-    "INSERT INTO Veiculos (Modelo, Marca, Ano, Placa, Disponibilidade) VALUES (?, ?, ?, ?, ?)",
-    [modelo, marca, ano, placa, disponibilidade],
+    "UPDATE Veiculos SET Modelo = ?, Marca = ?, Ano = ?, Placa = ?, Disponibilidade = ? WHERE ID = ?",
+    [Modelo, Marca, Ano, Placa, Disponibilidade, id],
     function (err) {
       if (err) {
         handleDatabaseError(res, err);
         return;
       }
-      res.json({ id: this.lastID });
+      res.json({ success: true });
+    },
+  );
+});
+
+router.delete("/:id", (req, res) => {
+  const id = req.params.id;
+  db.run("DELETE FROM Veiculos WHERE ID = ?", [id], function (err) {
+    if (err) {
+      handleDatabaseError(res, err);
+      return;
+    }
+    res.sendStatus(200);
+  });
+});
+
+router.post("/", (req, res) => {
+  const { Modelo, Marca, Ano, Placa, Disponibilidade } = req.body;
+  db.run(
+    "INSERT INTO Veiculos (Modelo, Marca, Ano, Placa, Disponibilidade) VALUES (?, ?, ?, ?, ?)",
+    [Modelo, Marca, Ano, Placa, Disponibilidade],
+    function (err) {
+      if (err) {
+        handleDatabaseError(res, err);
+        return;
+      }
+      const veiculo = {
+        id: this.lastID,
+        modelo: Modelo,
+        marca: Marca,
+        ano: Ano,
+        placa: Placa,
+        disponibilidade: Disponibilidade,
+      };
+
+      res.json(veiculo);
     },
   );
 });
